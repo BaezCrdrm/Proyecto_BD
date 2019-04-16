@@ -4,6 +4,9 @@
 /*  DBMS       : MySql 						*/
 /* ---------------------------------------------------- */
 
+-- CREATE DATABASE sibdd;
+USE sibdd;
+
 SET FOREIGN_KEY_CHECKS=0 
 ;
 

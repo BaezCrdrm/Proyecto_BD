@@ -203,32 +203,3 @@ INSERT INTO Detalles_Pedidos (id_proveedor, id_articulo, cantidad, costo_total_p
 VALUES (2, 2, 4, 300, 1);
 INSERT INTO Detalles_Pedidos (id_proveedor, id_articulo, cantidad, costo_total_por_producto, id_pedido)
 VALUES (1, 2, 6, 200, 2);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
