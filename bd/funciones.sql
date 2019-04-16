@@ -128,6 +128,29 @@ END $$
 
 DELIMITER ;
 
+/*
+3. Generar una consulta que te permita obtener un listado 
+de los artículos más y menos vendidos por sucursal  
+*/
+DELIMITER $$
+CREATE OR REPLACE PROCEDURE Funcion3(IN orderby VARCHAR(50))
+BEGIN
+
+    SELECT 
+        a.nombre,
+        SUM(vd.cantidad) AS "Vendidos"
+    FROM Articulos a 
+    LEFT JOIN Ventas_detalle vd
+    ON vd.id_articulo = a.id_articulo
+    INNER JOIN Ventas_cabecera vc
+    ON vc.id_venta_cabecera = vd.id_venta_cabecera
+    GROUP BY a.nombre
+    ORDER BY CASE WHEN orderby='ASC' THEN SUM(vd.cantidad) END,
+        CASE WHEN orderby='DESC' THEN SUM(vd.cantidad) END DESC;
+END $$
+
+DELIMITER ;
+
 /* 
 4. Mostrar un listado de artículos con la siguiente información:
 Clave del artículo y Nombre del artículo (En una misma columna, Marca, 
