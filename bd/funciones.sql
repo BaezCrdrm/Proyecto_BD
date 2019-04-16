@@ -39,6 +39,95 @@ END $$
 
 DELIMITER ;
 
+/*
+2. Se debe generar una función que dado el nombre de un cliente 
+te devuelva: El producto que más ha comprado, 
+el producto que menos ha comprado, 
+la sucursal en la que más compra y la cantidad de su compra más alta 
+*/
+DELIMITER $$
+CREATE OR REPLACE PROCEDURE Funcion2(IN nombre_cliente VARCHAR(50))
+BEGIN
+
+    DECLARE unoNombre VARCHAR(50);
+    DECLARE unoTotal INT unsigned DEFAULT 0;
+    DECLARE dosNombre VARCHAR(50);
+    DECLARE dosTotal INT unsigned DEFAULT 0;
+    DECLARE tresNombre VARCHAR(50);
+    DECLARE cuatroTotal DOUBLE unsigned DEFAULT 0.0;
+
+    SELECT
+        a.nombre,
+        COUNT(vd.id_articulo) total
+    INTO
+        unoNombre,
+        unoTotal
+    FROM Clientes c
+    INNER JOIN Ventas_cabecera vc
+    ON vc.id_cliente = c.id_cliente
+    INNER JOIN Ventas_detalle vd
+    ON vd.id_venta_cabecera = vc.id_venta_cabecera
+    INNER JOIN Articulos a
+    ON vd.id_articulo = a.id_articulo
+    WHERE c.nombre = nombre_cliente
+    GROUP BY c.nombre, a.nombre
+    ORDER BY total DESC LIMIT 1;
+
+    SELECT
+        a.nombre,
+        COUNT(vd.id_articulo) total
+    INTO
+        dosNombre,
+        dosTotal
+    FROM Clientes c
+    INNER JOIN Ventas_cabecera vc
+    ON vc.id_cliente = c.id_cliente
+    INNER JOIN Ventas_detalle vd
+    ON vd.id_venta_cabecera = vc.id_venta_cabecera
+    INNER JOIN Articulos a
+    ON vd.id_articulo = a.id_articulo
+    WHERE c.nombre = nombre_cliente
+    GROUP BY c.nombre, a.nombre
+    ORDER BY total ASC LIMIT 1;
+
+    SELECT
+        s.nombre
+    INTO
+        tresNombre
+    FROM Clientes c
+    INNER JOIN Ventas_cabecera vc
+    ON vc.id_cliente = c.id_cliente
+    INNER JOIN Sucursales s
+    ON s.id_sucursal = vc.id_sucursal
+    WHERE c.nombre = nombre_cliente
+    GROUP BY c.nombre, s.nombre
+    ORDER BY COUNT(vc.id_cliente) DESC LIMIT 1;
+
+
+    SELECT
+        MAX(vc.precio_total) total
+    INTO
+        cuatroTotal
+    FROM Clientes c
+    INNER JOIN Ventas_cabecera vc
+    ON vc.id_cliente = c.id_cliente
+    WHERE c.nombre = nombre_cliente
+    GROUP BY c.nombre, vc.id_venta_cabecera
+    ORDER BY MAX(vc.precio_total) DESC LIMIT 1;
+
+    SELECT
+        unoNombre
+        unoTotal,
+        dosNombre,
+        dosTotal,
+        tresNombre,
+        cuatroTotal
+    FROM CLIENTES
+    ORDER BY unoNombre DESC LIMIT 1;
+END $$
+
+DELIMITER ;
+
 /* 
 4. Mostrar un listado de artículos con la siguiente información:
 Clave del artículo y Nombre del artículo (En una misma columna, Marca, 
