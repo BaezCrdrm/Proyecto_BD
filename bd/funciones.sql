@@ -1,21 +1,43 @@
 USE sibdd;
 
-/*
-Se debe generar una función que dado el nombre de un artículo te 
+/* 
+1. Se debe generar una función que dado el nombre de un artículo te 
 regrese el proveedor al que más le has comprado ese artículo, 
 el mejor precio que te ha dado ese proveedor para ese artículo, 
 el precio más alto que te ha dado y el último precio. Los precios 
 deben ser en formato moneda
 */
 
-SELECT p.nombre, COUNT(p.nombre) maximo, a.nombre, SUM(dp.cantidad), MIN(dp.costo_total_por_producto / dp.cantidad) MEJOR_PRECIO, MAX(dp.costo_total_por_producto / dp.cantidad) PRECIO_MAS_ALTO, 
-(SELECT  dp.costo_total_por_producto / dp.cantidad FROM Detalles_Pedidos dp INNER JOIN Articulos a ON dp.id_articulo = a.id_articulo 
-WHERE dp.id_detalle_pedido = (SELECT MAX(dp.id_detalle_pedido) FROM Detalles_Pedidos dp INNER JOIN Articulos a ON dp.id_articulo = a.id_articulo 
-WHERE a.nombre = 'Lapiz triangular')) ULTIMO_PRECIO 
-FROM Detalles_Pedidos dp INNER JOIN Proveedores p ON dp.id_proveedor = p.id_proveedor
-INNER JOIN Articulos a ON dp.id_articulo = a.id_articulo WHERE a.nombre = 'Lapiz triangular'
-GROUP BY p.nombre
-ORDER BY maximo DESC LIMIT 1;
+DELIMITER $$
+CREATE OR REPLACE PROCEDURE Funcion1(IN nombre_articulo VARCHAR(50))
+BEGIN
+    SELECT 
+        p.nombre, 
+        COUNT(p.nombre) maximo, 
+        a.nombre, SUM(dp.cantidad), 
+        MIN(dp.costo_total_por_producto / dp.cantidad) MEJOR_PRECIO, 
+        MAX(dp.costo_total_por_producto / dp.cantidad) PRECIO_MAS_ALTO, 
+        (SELECT
+            dp.costo_total_por_producto / dp.cantidad 
+        FROM Detalles_Pedidos dp 
+        INNER JOIN Articulos a 
+        ON dp.id_articulo = a.id_articulo 
+        WHERE dp.id_detalle_pedido = (SELECT MAX(dp.id_detalle_pedido) 
+            FROM Detalles_Pedidos dp 
+            INNER JOIN Articulos a 
+            ON dp.id_articulo = a.id_articulo 
+            WHERE a.nombre = nombre_articulo)) ULTIMO_PRECIO 
+    FROM Detalles_Pedidos dp 
+    INNER JOIN Proveedores p 
+    ON dp.id_proveedor = p.id_proveedor
+    INNER JOIN Articulos a 
+    ON dp.id_articulo = a.id_articulo 
+    WHERE a.nombre = nombre_articulo
+    GROUP BY p.nombre
+    ORDER BY maximo DESC LIMIT 1;
+END $$
+
+DELIMITER ;
 
 /* 
 Mostrar un listado de artículos con la siguiente información:
@@ -32,7 +54,7 @@ ORDER BY a.id_articulo ASC;
 
 
 /*
-Generar un función que dado el nombre de un cliente, 
+5. Generar un función que dado el nombre de un cliente, 
 le modifique su porcentaje de descuento de acuerdo a 
 los siguientes criterios: 
 - Si ha hecho más de 15 compras 
