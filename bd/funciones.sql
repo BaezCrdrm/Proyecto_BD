@@ -40,14 +40,35 @@ END $$
 DELIMITER ;
 
 /* 
-Mostrar un listado de artículos con la siguiente información:
+4. Mostrar un listado de artículos con la siguiente información:
 Clave del artículo y Nombre del artículo (En una misma columna, Marca, 
 Precio unitario, Existencia, Proveedor con el que se compró por última vez, 
 la cantidad que se compró y el total que se pagó en ese pedido
 */
-SELECT a.id_articulo, a.nombre, CONCAT(m.marca, ' - ', precio_unitario, ' - ',  existencia) 'MARCA - PRECIO UNITARIO - EXISTENCIA'
-FROM Articulos a INNER JOIN Marcas m ON a.id_marca = m.id_marca
-ORDER BY a.id_articulo ASC;
+DELIMITER $$
+CREATE OR REPLACE PROCEDURE Funcion2()
+BEGIN
+    SELECT
+        a.nombre,
+        CONCAT(m.marca, ' - ', 
+            a.precio_unitario, ' - ',  
+            a.existencia, ' - ',
+            pr.nombre, ' - ',
+            pe.costo_total) 'MARCA - PRECIO UNITARIO - EXISTENCIA - PROVEEDOR - TOTAL'
+    FROM Articulos a
+    INNER JOIN Marcas m 
+    ON a.id_marca = m.id_marca
+    INNER JOIN Detalles_Pedidos dp
+    ON dp.id_articulo = a.id_articulo
+    INNER JOIN Pedidos pe
+    ON dp.id_pedido = pe.id_pedido
+    LEFT JOIN Proveedores pr
+    ON dp.id_proveedor = pr.id_proveedor
+    GROUP BY a.nombre, pr.id_proveedor
+    ORDER BY a.id_articulo, pe.fecha_pedido ASC;
+END $$
+
+DELIMITER ;
 
 
 
